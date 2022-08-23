@@ -1,0 +1,9 @@
+adonis/backend/public/uploads/
+adonis/backend/node_modules
+adonis/backend/build
+adonis/backend/coverage
+adonis/backend/.vscode
+adonis/backend/.DS_STORE
+adonis/backend/.env
+adonis/backend/tmp
+
