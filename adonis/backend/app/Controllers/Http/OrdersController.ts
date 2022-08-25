@@ -67,6 +67,7 @@ export default class OrdersController {
     const order = await Order.create({
       addressId: payload.address_id,
       customerProfileId: payload.customer_profile_id,
+
       items: payload.items,
     })
     // if payload has order_items, add them to the order
