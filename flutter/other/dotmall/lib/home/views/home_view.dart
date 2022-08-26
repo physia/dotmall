@@ -5,6 +5,7 @@ import 'package:dotmall_sdk/dotmall_sdk.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:routemaster/routemaster.dart';
 
 import '../../app/app.dart';
 import '../../category/widgets/widgets.dart';
@@ -61,7 +62,7 @@ class HomeView extends StatelessWidget {
             scrollable: true,
             gridCount: 1,
             onItemPressed: (List<Model> selections, model) {
-              App.router.push("/categories/${model.id}");
+              Routemaster.of(context).push("/categories/${model.id}");
             },
             itemBuilder: (context, panel, model, state) {
               return CategoryCard(
@@ -98,7 +99,7 @@ class HomeView extends StatelessWidget {
             handlers: CollectionEventHandlers(),
             scrollDirection: Axis.vertical,
             scrollable: false,
-            gridCount: 1,
+            gridCount: 2,
             itemBuilder: (context, panel, model, state) {
               return SemanticCard(
                   model == null ? null : panel.collection.semanticsOf(model),

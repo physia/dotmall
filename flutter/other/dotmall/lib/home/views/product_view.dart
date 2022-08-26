@@ -72,15 +72,87 @@ class ProductView extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              model?.name ?? "",
-                              style: TextStyle(
-                                fontSize: 20,
-                                // fontWeight: FontWeight.bold,
-                              ),
-                              textAlign: TextAlign.start,
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  model?.name ?? "",
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  textAlign: TextAlign.start,
+                                ),
+                                CGradientBox(
+                                  child: IconButton(
+                                    onPressed: () {},
+                                    icon: Icon(FluentIcons.heart_24_filled),
+                                  ),
+                                ),
+                              ],
                             ),
                             SizedBox(height: 6),
+
+                            Row(
+                              mainAxisSize: MainAxisSize.max,
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                Column(children: [
+                                  Icon(
+                                    FluentIcons.star_24_regular,
+                                    color: Theme.of(context)
+                                        .textTheme
+                                        .caption!
+                                        .color,
+                                  ),
+                                  Text(
+                                    "4.5",
+                                    style:
+                                        Theme.of(context).textTheme.titleSmall,
+                                  ),
+                                  Text(
+                                    "RATE",
+                                    style: Theme.of(context).textTheme.caption,
+                                  ),
+                                ]),
+                                Column(children: [
+                                  Icon(
+                                    FluentIcons.box_arrow_left_24_regular,
+                                    color: Theme.of(context)
+                                        .textTheme
+                                        .caption!
+                                        .color,
+                                  ),
+                                  Text(
+                                    "57",
+                                    style:
+                                        Theme.of(context).textTheme.titleSmall,
+                                  ),
+                                  Text(
+                                    "ORDERS",
+                                    style: Theme.of(context).textTheme.caption,
+                                  ),
+                                ]),
+                                Column(children: [
+                                  Icon(
+                                    FluentIcons.person_24_regular,
+                                    color: Theme.of(context)
+                                        .textTheme
+                                        .caption!
+                                        .color,
+                                  ),
+                                  Text(
+                                    "4.5",
+                                    style:
+                                        Theme.of(context).textTheme.titleSmall,
+                                  ),
+                                  Text(
+                                    "VIEWS",
+                                    style: Theme.of(context).textTheme.caption,
+                                  ),
+                                ]),
+                              ],
+                            ),
                             // in stock
                             Text(
                               "In stock ${model?.quantity}",

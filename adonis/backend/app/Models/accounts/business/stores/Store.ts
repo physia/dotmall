@@ -1,5 +1,17 @@
 import { DateTime } from 'luxon'
-import {  afterDelete, beforeFetch, belongsTo, BelongsTo, column, hasMany, HasMany, hasOne, HasOne, ManyToMany, ModelQueryBuilderContract } from '@ioc:Adonis/Lucid/Orm'
+import {
+  afterDelete,
+  beforeFetch,
+  belongsTo,
+  BelongsTo,
+  column,
+  hasMany,
+  HasMany,
+  hasOne,
+  HasOne,
+  ManyToMany,
+  ModelQueryBuilderContract,
+} from '@ioc:Adonis/Lucid/Orm'
 import Product from './Product'
 import Section from './Section'
 import Order from './Order'
@@ -20,22 +32,21 @@ export enum StoreStatus {
   suspended = 3,
 }
 export default class Store extends DotBaseModel {
-
   @column()
   public name: string
 
   @column()
-  public description: string|null
+  public description: string | null
 
   //status
   @column()
   public status: StoreStatus
 
   @column.dateTime()
-  public validatedAt: DateTime|null
+  public validatedAt: DateTime | null
 
   @column.dateTime()
-  public deletedAt: DateTime|null
+  public deletedAt: DateTime | null
 
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime
@@ -56,38 +67,36 @@ export default class Store extends DotBaseModel {
   @hasMany(() => StoreTranslation)
   public translations: HasMany<typeof StoreTranslation>
 
-
   @hasOne(() => Address, {
-    foreignKey: "relatedId",
+    foreignKey: 'relatedId',
     onQuery: (builder) => {
       builder.where('related_type', 'stores:address')
-    }
+    },
   })
   public address: HasOne<typeof Address>
 
   //category_id
   @column()
-  public categoryId: string|null
+  public categoryId: string | null
 
   @belongsTo(() => Category)
   public category: BelongsTo<typeof Category>
 
   @hasOne(() => Email, {
-    foreignKey: "relatedId",
+    foreignKey: 'relatedId',
     onQuery: (builder) => {
       builder.where('related_type', 'stores:email')
-    }
+    },
   })
   public email: HasOne<typeof Email>
 
   @hasOne(() => Phone, {
-    foreignKey: "relatedId",
+    foreignKey: 'relatedId',
     onQuery: (builder) => {
       builder.where('related_type', 'stores:phone')
-    }
+    },
   })
   public phone: HasOne<typeof Phone>
-
 
   // @hasOne(() => Image, {
   //   foreignKey: "relatedId",
@@ -108,13 +117,11 @@ export default class Store extends DotBaseModel {
   @column()
   public merchantProfileId: string
 
-
   // load photo after fetch
   @beforeFetch()
   public static async loadPhoto(query: ModelQueryBuilderContract<typeof Store>) {
     query.preload('photos')
   }
-
 
   // before delete, delete photo
   @afterDelete()

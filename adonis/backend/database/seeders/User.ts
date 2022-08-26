@@ -62,7 +62,7 @@ export default class UserSeeder extends BaseSeeder {
         productsFiles.push(
           await Image.create({
             name: faker.lorem.words(2),
-            path: faker.image.imageUrl(400,220,undefined,true,true),
+            path: faker.random.arrayElement(TechLogosList).src, //faker.image.imageUrl(400, 220, undefined, true, true),
             userId: user!.id,
           })
         )
@@ -166,9 +166,7 @@ export default class UserSeeder extends BaseSeeder {
       })
       categoryTranslations.push(categoryTranslation)
 
-
       for (let j = 0; j < 20; j++) {
-
         // create store
         let store = await Store.create({
           merchantProfileId: merchant.id,
@@ -218,55 +216,55 @@ export default class UserSeeder extends BaseSeeder {
         })
         sectionTranslations.push(sectionTranslation)
         for (let k = 0; k < 20; k++) {
-        // create product
-        let product = await Product.create({
-          sectionId: section.id,
-          storeId: store.id,
-          name: faker.commerce.productName(),
-          description: faker.lorem.paragraph(1),
-          // barcode is string
-          barcode: faker.random.word(),
-          price: Number(faker.commerce.price()),
-          quantity: faker.random.arrayElement([0, 1, 53, 4, 500, 96, 87, 858, 9, 10]),
-          body: faker.lorem.paragraph(1),
-          // slug: faker.commerce.productName().toLowerCase(),
-          status: faker.random.arrayElement(getEnumKeys(ProductStatus)) as unknown as ProductStatus,
-          type: faker.random.arrayElement(getEnumKeys(ProductType)) as unknown as ProductType,
-          meta: {
-            keywords: faker.lorem.words(),
-          },
-        })
-        products.push(product)
-        var ids:string[] = [];
-        for (let i = 0; i < 5; i++) {
-          var randomId = () => {
-            let _id = (faker.random.arrayElement(productsFiles) as File).id
-            if (ids.includes(_id)) {
-              _id = randomId()
-            }
-            ids.push(_id)
-            return _id
-          }
-          await product.related('photos').attach({
-            [randomId()]: {
-              id: DotBaseModel.generateId(),
-              tag: 'product:photo',
+          // create product
+          let product = await Product.create({
+            sectionId: section.id,
+            storeId: store.id,
+            name: faker.commerce.productName(),
+            description: faker.lorem.paragraph(1),
+            // barcode is string
+            barcode: faker.random.word(),
+            price: Number(faker.commerce.price()),
+            quantity: faker.random.arrayElement([0, 1, 53, 4, 500, 96, 87, 858, 9, 10]),
+            body: faker.lorem.paragraph(1),
+            // slug: faker.commerce.productName().toLowerCase(),
+            status: faker.random.arrayElement(
+              getEnumKeys(ProductStatus)
+            ) as unknown as ProductStatus,
+            type: faker.random.arrayElement(getEnumKeys(ProductType)) as unknown as ProductType,
+            meta: {
+              keywords: faker.lorem.words(),
             },
           })
+          products.push(product)
+          var ids: string[] = []
+          for (let i = 0; i < 5; i++) {
+            var randomId = () => {
+              let _id = (faker.random.arrayElement(productsFiles) as File).id
+              if (ids.includes(_id)) {
+                _id = randomId()
+              }
+              ids.push(_id)
+              return _id
+            }
+            await product.related('photos').attach({
+              [randomId()]: {
+                id: DotBaseModel.generateId(),
+                tag: 'product:photo',
+              },
+            })
+          }
+          // create product translation
+          let productTranslation = await ProductTranslation.create({
+            locale: 'en',
+            name: faker.commerce.productName(),
+            description: faker.lorem.paragraph(1),
+            body: faker.lorem.paragraph(1),
+            productId: product.id,
+            slug: faker.commerce.productName().toLowerCase(),
+          })
+          productTranslations.push(productTranslation)
         }
-        // create product translation
-        let productTranslation = await ProductTranslation.create({
-          locale: 'en',
-          name: faker.commerce.productName(),
-          description: faker.lorem.paragraph(1),
-          body: faker.lorem.paragraph(1),
-          productId: product.id,
-          slug: faker.commerce.productName().toLowerCase(),
-        })
-        productTranslations.push(productTranslation)
-
-
-      }
       }
     }
   }

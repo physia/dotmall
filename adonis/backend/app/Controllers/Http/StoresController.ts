@@ -1,21 +1,27 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import  { CreateStoreValidator, DestroyStoreValidator, ListStoresValidator, ShowStoreValidator, UpdateStoreValidator } from 'App/Validators/StoreValidator'
+import {
+  CreateStoreValidator,
+  DestroyStoreValidator,
+  ListStoresValidator,
+  ShowStoreValidator,
+  UpdateStoreValidator,
+} from 'App/Validators/StoreValidator'
 import File, { Image } from 'App/Models/File'
-import { ModelObject } from '@ioc:Adonis/Lucid/Orm';
-import Store, { StoreStatus } from 'App/Models/accounts/business/stores/Store';
+import { ModelObject } from '@ioc:Adonis/Lucid/Orm'
+import Store, { StoreStatus } from 'App/Models/accounts/business/stores/Store'
 
 export default class StoresController {
   /**
-    * returns the user's stores as pangination list
-    * @param {HttpContextContract}
-    * @returns {Promise<{meta: any;data: ModelObject[];}>}
-    * @memberof StoresController
-    * @example
-    * curl -X GET -H "Content-Type: application/json" -d '{"page": 1}' http://localhost:3333/api/v1/stores
-    */
-  public async index({  request, bouncer }: HttpContextContract): Promise<{
-    meta: any;
-    data: ModelObject[];
+   * returns the user's stores as pangination list
+   * @param {HttpContextContract}
+   * @returns {Promise<{meta: any;data: ModelObject[];}>}
+   * @memberof StoresController
+   * @example
+   * curl -X GET -H "Content-Type: application/json" -d '{"page": 1}' http://localhost:3333/api/v1/stores
+   */
+  public async index({ request, bouncer }: HttpContextContract): Promise<{
+    meta: any
+    data: ModelObject[]
   }> {
     const payload = await request.validate(ListStoresValidator)
     await bouncer.with('StorePolicy').authorize('viewList', payload)
@@ -23,11 +29,10 @@ export default class StoresController {
     var page = 1
     var limit = 12
 
-
     if (payload.search) {
       for (let i = 0; i < payload.search_in!.length; i++) {
-        const element = payload.search_in![i];
-        if (i == 0) {
+        const element = payload.search_in![i]
+        if (i === 0) {
           storesQuery = storesQuery.where(element, 'like', `%${payload.search}%`)
         } else {
           storesQuery = storesQuery.orWhere(element, 'like', `%${payload.search}%`)
@@ -61,7 +66,7 @@ export default class StoresController {
    * @example
    * curl -X PUT -H "Content-Type: application/json" -d '{"name": "My Store", "type": "Bank", "number": "123456789"}' http://localhost:3333/api/v1/stores
    */
-  public async store({ request,auth, bouncer }: HttpContextContract) {
+  public async store({ request, auth, bouncer }: HttpContextContract) {
     const payload = await request.validate(CreateStoreValidator)
     await bouncer.with('StorePolicy').authorize('create', payload)
     const store = await Store.create({
@@ -70,7 +75,7 @@ export default class StoresController {
       status: StoreStatus.active,
       merchantProfileId: payload.merchant_profile_id,
     })
-    var photo: Image | null = null;
+    var photo: Image | null = null
     if (payload.photo) {
       photo = await File.attachModel<Image>({
         related_id: store.id,
@@ -82,7 +87,7 @@ export default class StoresController {
     return {
       store: {
         ...store.toJSON(),
-        photos: [...(()=>photo ? [photo]:[])()],
+        photos: [...(() => (photo ? [photo] : []))()],
       },
     }
   }
@@ -120,7 +125,7 @@ export default class StoresController {
    * @example
    * curl -X PUT -H "Content-Type: application/json" -d '{"name": "My Store", "type": "Bank", "number": "123456789"}' http://localhost:3333/api/v1/stores/1
    */
-  public async update({ request, auth,bouncer }: HttpContextContract): Promise<any> {
+  public async update({ request, auth, bouncer }: HttpContextContract): Promise<any> {
     // validate also params.id
     const payload = await request.validate(UpdateStoreValidator)
     const store = (await Store.find(payload.params.id))!
@@ -128,7 +133,7 @@ export default class StoresController {
     store.name = payload.name ?? store.name
     store.description = payload.description ?? store.description
     await store.save()
-    var photo: Image | null = null;
+    var photo: Image | null = null
     if (payload.photo) {
       photo = await File.attachModel<Image>({
         related_id: store.id,
@@ -141,7 +146,7 @@ export default class StoresController {
     return {
       store: {
         ...store.toJSON(),
-        photos: [...(()=>photo ? [photo]:[])()],
+        photos: [...(() => (photo ? [photo] : []))()],
       },
     }
   }
@@ -160,6 +165,4 @@ export default class StoresController {
     await bouncer.with('StorePolicy').authorize('delete', store)
     return await store.delete()
   }
-
-
 }

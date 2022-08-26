@@ -208,6 +208,7 @@ class _CollectionListPanelState<C extends Collection, M extends Model>
       _listError = false;
       _listLoading = true;
     });
+    await Future.delayed(Duration(seconds: 2));
     try {
       widget.handlers.onListLoading(cancelToken);
       var response = await widget.collection
@@ -545,6 +546,8 @@ class _CollectionFindPanelState<C extends Collection, M extends Model>
       _findError = false;
       _findLoading = true;
     });
+
+    await Future.delayed(Duration(seconds: 2));
     try {
       widget.handlers.onListLoading(cancelToken);
       var response = await widget.collection.findR(widget.id,
