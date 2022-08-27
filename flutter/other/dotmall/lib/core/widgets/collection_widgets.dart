@@ -854,7 +854,8 @@ class SemanticCard<T extends Model> extends StatelessWidget {
                                       ? null
                                       : style?.leadingDecoration) ??
                                   BoxDecoration(
-                                    color: Colors.grey.withOpacity(0.2),
+                                    color: Theme.of(context)
+                                        .scaffoldBackgroundColor,
                                     borderRadius: style
                                             ?.leadingDecoration?.borderRadius ??
                                         BorderRadius.circular(8),

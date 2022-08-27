@@ -3,7 +3,6 @@ import 'dart:ui';
 
 import 'package:dio/dio.dart';
 import 'package:dotmall_sdk/dotmall_sdk.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -12,7 +11,6 @@ import 'package:routemaster/routemaster.dart';
 
 import '../../app/app.dart';
 import '../../core/widgets/widgets.dart';
-import '../../home/views/home_view.dart';
 import '../../l10n/l10n.dart';
 import '../bloc/auth_bloc.dart';
 import '../../core/helpers/heplers.dart';
@@ -204,11 +202,6 @@ mixin AuthMixin<T extends StatefulWidget> on State<T> {
   }
 
   void _authSigninButtonAction() {
-    // TODO: delete this
-
-    Routemaster.of(context).replace('/home');
-
-    return;
     var _creditials = _authValidatedUserAuthCredentials();
     if (_creditials != null) {
       context.read<AuthBloc>()

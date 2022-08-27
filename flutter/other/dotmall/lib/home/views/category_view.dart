@@ -12,6 +12,7 @@ import '../../category/widgets/widgets.dart';
 import '../../core/widgets/collection_widgets.dart';
 import '../../core/widgets/widgets.dart';
 import '../../l10n/l10n.dart';
+import '../widgets/widgets.dart';
 
 class CategoryView extends StatelessWidget {
   const CategoryView({Key? key}) : super(key: key);
@@ -20,32 +21,7 @@ class CategoryView extends StatelessWidget {
   Widget build(BuildContext context) {
     final storesPanelController =
         StreamController<CollectionPanelEvent>.broadcast();
-    return Scaffold(
-      appBar: AppBar(
-        titleSpacing: 0,
-        leadingWidth: 40,
-        centerTitle: true,
-        leading: Builder(
-          builder: (BuildContext context) {
-            return IconButton(
-              icon: const Icon(FluentIcons.arrow_left_48_regular),
-              onPressed: () {
-                if (Navigator.of(context).canPop()) {
-                  Navigator.of(context).pop();
-                }
-              },
-              tooltip: MaterialLocalizations.of(context).backButtonTooltip,
-            );
-          },
-        ),
-        // title: CGradientBox(child: AppLogo.square(30)),
-        actions: [
-          IconButton(
-            icon: Icon(FluentIcons.cart_16_regular),
-            onPressed: () {},
-          ),
-        ],
-      ),
+    return AppScaffold(
       body: ScrollableArea(
         onEnd: (metrics) async {
           storesPanelController.add(
@@ -58,68 +34,73 @@ class CategoryView extends StatelessWidget {
             ),
           );
         },
-        child: Column(
-          children: [
-            SizedBox(
-              width: double.infinity,
-              child: CollectionFindPanel<Categories, Category>(
-                id: RouteData.of(context).pathParameters["id"]!,
-                collection:
-                    Categories(Manager(context.read<AppBloc>().configs)),
+        child: Padding(
+          padding: AppScaffold.edgeInsets,
+          child: Column(
+            children: [
+              SizedBox(
+                width: double.infinity,
+                child: CollectionFindPanel<Categories, Category>(
+                  id: RouteData.of(context).pathParameters["id"]!,
+                  collection:
+                      Categories(Manager(context.read<AppBloc>().configs)),
+                  handlers: CollectionEventHandlers(),
+                  itemBuilder: (context, panel, model, state) {
+                    return SizedBox(
+                      child: SemanticCard(
+                        model == null
+                            ? null
+                            : panel.collection.semanticsOf(model),
+                        onPressed: null,
+                        style: SemanticCardStyle(
+                          direction: Axis.vertical,
+                          decoration: BoxDecoration(),
+                          leadingWidth: 60,
+                          leadingHeight: 60,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          textAlignment: CrossAxisAlignment.center,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              CollectionListPanel<Stores, Store>(
+                controller: storesPanelController,
+                collection: Stores(Manager(context.read<AppBloc>().configs)),
                 handlers: CollectionEventHandlers(),
+                scrollDirection: Axis.vertical,
+                scrollable: false,
+                autoStartLoad: false,
+                gridCount: 2,
+                onItemPressed: (List<Model> selections, model) {
+                  selections.clear();
+                  selections.add(model);
+                },
                 itemBuilder: (context, panel, model, state) {
                   return SizedBox(
+                    width: 170,
                     child: SemanticCard(
                       model == null
                           ? null
                           : panel.collection.semanticsOf(model),
-                      onPressed: null,
+                      onPressed: () {
+                        App.router.push("/stores/${model!.id}");
+                      },
                       style: SemanticCardStyle(
                         direction: Axis.vertical,
-                        decoration: BoxDecoration(),
                         leadingWidth: 60,
                         leadingHeight: 60,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        textAlignment: CrossAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        textAlignment: CrossAxisAlignment.start,
                       ),
                     ),
                   );
                 },
               ),
-            ),
-            CollectionListPanel<Stores, Store>(
-              controller: storesPanelController,
-              collection: Stores(Manager(context.read<AppBloc>().configs)),
-              handlers: CollectionEventHandlers(),
-              scrollDirection: Axis.vertical,
-              scrollable: false,
-              autoStartLoad: false,
-              gridCount: 2,
-              onItemPressed: (List<Model> selections, model) {
-                selections.clear();
-                selections.add(model);
-              },
-              itemBuilder: (context, panel, model, state) {
-                return SizedBox(
-                  width: 170,
-                  child: SemanticCard(
-                    model == null ? null : panel.collection.semanticsOf(model),
-                    onPressed: () {
-                      App.router.push("/stores/${model!.id}");
-                    },
-                    style: SemanticCardStyle(
-                      direction: Axis.vertical,
-                      leadingWidth: 60,
-                      leadingHeight: 60,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      textAlignment: CrossAxisAlignment.start,
-                    ),
-                  ),
-                );
-              },
-            ),
-            const SizedBox(height: 50),
-          ],
+              const SizedBox(height: 50),
+            ],
+          ),
         ),
       ),
     );

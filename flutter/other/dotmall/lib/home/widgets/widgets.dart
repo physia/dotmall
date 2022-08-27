@@ -4,7 +4,6 @@ import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:routemaster/routemaster.dart';
 
-import '../../app/app.dart';
 import '../../core/widgets/collection_widgets.dart';
 import '../../core/widgets/elements.dart';
 import '../../core/widgets/gradient_box.dart';
@@ -17,7 +16,7 @@ class AppScaffold extends StatelessWidget {
     required this.body,
   }) : super(key: key);
 
-  final ScrollableArea body;
+  final Widget body;
 
   @override
   Widget build(BuildContext context) {
@@ -118,7 +117,9 @@ class AppScaffold extends StatelessWidget {
                     leadingWidth: 40,
                     centerTitle: true,
                     leading: Builder(builder: (context) {
-                      return Routemaster.of(context).history.canGoBack
+                      var rm = Routemaster.of(context);
+                      print(rm);
+                      return rm.history.canGoBack
                           ? IconButton(
                               icon: Icon(FluentIcons.arrow_left_24_regular),
                               onPressed: () {

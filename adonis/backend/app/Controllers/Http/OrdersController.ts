@@ -18,7 +18,7 @@ export default class OrdersController {
     data: ModelObject[];
   }> {
     const payload = await request.validate(ListOrdersValidator)
-    await bouncer.with('OrderPolicy').authorize('viewList', payload)
+    // await bouncer.with('OrderPolicy').authorize('viewList', payload)
     var ordersQuery = Order.query()
     var page = 1
     var limit = 12

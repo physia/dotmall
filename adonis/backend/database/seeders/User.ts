@@ -21,6 +21,8 @@ import File, { Image } from 'App/Models/File'
 import Logger from '@ioc:Adonis/Core/Logger'
 import TechLogosList from 'Dot/TechLogosList'
 import MerchantProfile from 'App/Models/accounts/profiles/MerchantProfile'
+import Order from 'App/Models/accounts/business/stores/Order'
+import Address from 'App/Models/Address'
 
 // function to get enum keys
 function getEnumKeys(enumType) {
@@ -41,7 +43,7 @@ export default class UserSeeder extends BaseSeeder {
     var storeTranslations: any = []
     var sections: any = []
     var sectionTranslations: any = []
-    var products: any = []
+    var products: Product[] = []
     var productTranslations: any = []
     var files: any = []
     var file_id: string = ''
@@ -56,6 +58,7 @@ export default class UserSeeder extends BaseSeeder {
       users.push(user)
 
       var userFiles: any = []
+      var userAddresses: Address[] = []
       var productsFiles: any = []
       // create images
       for (let i = 0; i < 300; i++) {
@@ -64,6 +67,18 @@ export default class UserSeeder extends BaseSeeder {
             name: faker.lorem.words(2),
             path: faker.random.arrayElement(TechLogosList).src, //faker.image.imageUrl(400, 220, undefined, true, true),
             userId: user!.id,
+          })
+        )
+      }
+      for (let i = 0; i < 10; i++) {
+        userAddresses.push(
+          await Address.create({
+            primary: faker.address.streetName(),
+            secondary: faker.address.secondaryAddress(),
+            country: faker.address.country(),
+            city: faker.address.cityName(),
+            latitude: Number(faker.address.latitude()),
+            longitude: Number(faker.address.longitude()),
           })
         )
       }
@@ -237,6 +252,41 @@ export default class UserSeeder extends BaseSeeder {
             },
           })
           products.push(product)
+
+          let order = Order.create({
+            addressId: faker.random.arrayElement(userAddresses)!.id,
+            customerProfileId: customer.id,
+
+            items: [
+              {
+                quantity: faker.random.arrayElement([1,5,3]),
+                product_id: faker.random.arrayElement(products)!.id,
+                price: faker.random.arrayElement([30,60.2,99.9])
+              },
+              {
+                quantity: faker.random.arrayElement([1,5,3]),
+                product_id: faker.random.arrayElement(products)!.id,
+                price: faker.random.arrayElement([30,60.2,99.9])
+              },
+              {
+                quantity: faker.random.arrayElement([1,5,3]),
+                product_id: faker.random.arrayElement(products)!.id,
+                price: faker.random.arrayElement([30,60.2,99.9])
+              },
+              {
+                quantity: faker.random.arrayElement([1,5,3]),
+                product_id: faker.random.arrayElement(products)!.id,
+                price: faker.random.arrayElement([30,60.2,99.9])
+              },
+              {
+                quantity: faker.random.arrayElement([1,5,3]),
+                product_id: faker.random.arrayElement(products)!.id,
+                price: faker.random.arrayElement([30,60.2,99.9])
+              },
+            ]
+          })
+
+
           var ids: string[] = []
           for (let i = 0; i < 5; i++) {
             var randomId = () => {

@@ -29,8 +29,8 @@ class App extends StatelessWidget {
   const App({super.key});
   static var _routes = RouteMap(
     routes: {
-      '/': (_) => const MaterialPage(child: AuthView()),
-      '/home': (_) => const MaterialPage(child: HomeView()),
+      '/auth': (_) => const MaterialPage(child: AuthView()),
+      '/': (_) => const MaterialPage(child: HomeView()),
       '/categories/:id': (_) => const MaterialPage(child: CategoryView()),
       '/stores/:id': (_) => const MaterialPage(child: StoreView()),
       '/products/:id': (_) => const MaterialPage(child: ProductView()),
