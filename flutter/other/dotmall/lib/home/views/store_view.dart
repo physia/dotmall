@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'dart:ui';
 
+import 'package:beamer/beamer.dart';
 import 'package:dotmall_sdk/dotmall_sdk.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:routemaster/routemaster.dart';
 
 import '../../app/bloc/app_bloc.dart';
 import '../../app/view/app.dart';
@@ -13,7 +13,8 @@ import '../../core/widgets/collection_widgets.dart';
 import '../widgets/widgets.dart';
 
 class StoreView extends StatelessWidget {
-  const StoreView({Key? key}) : super(key: key);
+  final String storeId;
+  const StoreView({Key? key, required this.storeId}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +27,7 @@ class StoreView extends StatelessWidget {
             CollectionPanelLoadListEvent(
               ListRequestOptions(
                 where: {
-                  'store_id': RouteData.of(context).pathParameters['id']!,
+                  'store_id': storeId,
                 },
               ),
             ),
@@ -39,9 +40,8 @@ class StoreView extends StatelessWidget {
               SizedBox(
                 width: double.infinity,
                 child: CollectionFindPanel<Stores, Store>(
-                  id: RouteData.of(context).pathParameters["id"]!,
+                  id: storeId,
                   collection: Stores(Manager(context.read<AppBloc>().configs)),
-                  handlers: CollectionEventHandlers(),
                   itemBuilder: (context, panel, model, state) {
                     return Stack(
                       children: [
@@ -136,7 +136,7 @@ class StoreView extends StatelessWidget {
                       model == null
                           ? null
                           : panel.collection.semanticsOf(model), onPressed: () {
-                    App.router.push("/products/${model!.id}");
+                    context.beamToNamed("/products/${model!.id}");
                   },
                       style: SemanticCardStyle(
                         leadingAspectRatio: 1,

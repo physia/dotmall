@@ -14,8 +14,7 @@ part 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   // repository
-  AuthRepository<Users> repository =
-      AuthRepository<Users>(collection: Users(Manager(Configs())));
+  AuthRepository<Users> repository = AuthRepository<Users>(collection: Users(Manager(Configs())));
   final AuthCacheRepository cachRepository = AuthCacheRepository();
 
   AuthBloc() : super(AuthEmptyState()) {
@@ -81,7 +80,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   FutureOr<void> _onAuthLoadingCache(
       AuthLoadingCacheEvent event, Emitter<AuthState> emit) async {
     emit(AuthLoadingCacheState());
-    Token? token = await cachRepository.readToken();
+    Token? token;
+    try {
+      token = await cachRepository.readToken();
+    } catch(e) {}
     if (token != null) {
       repository.collection.manager.token = token;
       add(AuthCheckingCachedTokenEvent());

@@ -1,13 +1,13 @@
 import 'dart:math';
 import 'dart:ui';
 
+import 'package:beamer/beamer.dart';
 import 'package:dio/dio.dart';
 import 'package:dotmall_sdk/dotmall_sdk.dart';
 import 'package:flutter/material.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:routemaster/routemaster.dart';
 
 import '../../app/app.dart';
 import '../../core/widgets/widgets.dart';
@@ -34,8 +34,8 @@ class _AuthViewState extends State<AuthView>
       body: Stack(
         children: [
           Positioned.fill(
-            child: Image.network(
-              "http://app.hvips.com/images/wp3.jpg",
+            child: Image.asset(
+              "assets/images/wp3.jpg",
               fit: BoxFit.cover,
             ),
           ),
@@ -235,7 +235,7 @@ mixin AuthMixin<T extends StatefulWidget> on State<T> {
           child: BlocListener<AuthBloc, AuthState>(
             listener: (context, state) {
               if (state is AuthResponseState) {
-                App.router.pop<AuthResponse>(state.response);
+                Navigator.of(context).maybePop<AuthResponse>(state.response);
               }
             },
             child: FormElementBox.parent(

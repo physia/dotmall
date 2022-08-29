@@ -1,8 +1,8 @@
 import 'dart:ui';
 
+import 'package:beamer/beamer.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
-import 'package:routemaster/routemaster.dart';
 
 import '../../core/widgets/collection_widgets.dart';
 import '../../core/widgets/elements.dart';
@@ -45,7 +45,7 @@ class AppScaffold extends StatelessWidget {
                 child: ListView(
                   children: [
                     DrawerHeader(
-                      child: Text("home"),
+                      child: Text(""),
                     ),
                     ListTile(
                       title: Text("home"),
@@ -96,58 +96,58 @@ class AppScaffold extends StatelessWidget {
           ),
         ),
       ),
-      body: Stack(
-        children: [
-          body,
-          Container(
-            margin: const EdgeInsets.all(8),
-            height: 45,
-            child: Hero(
-              tag: "APP_BAR_HERO_TAG",
-              child: ClipRRect(
-                borderRadius: BorderRadius.all(
-                  Radius.circular(14),
-                ),
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                  child: AppBar(
-                    backgroundColor:
-                        Theme.of(context).canvasColor.withOpacity(0.7),
-                    titleSpacing: 0,
-                    leadingWidth: 40,
-                    centerTitle: true,
-                    leading: Builder(builder: (context) {
-                      var rm = Routemaster.of(context);
-                      print(rm);
-                      return rm.history.canGoBack
-                          ? IconButton(
-                              icon: Icon(FluentIcons.arrow_left_24_regular),
-                              onPressed: () {
-                                Routemaster.of(context).pop();
-                              },
-                            )
-                          : IconButton(
-                              icon: Icon(FluentIcons.list_16_regular),
-                              onPressed: () {
-                                Scaffold.of(context).openDrawer();
-                              },
-                            );
-                    }),
-                    title: CGradientBox(
-                      child: AppLogo.square(30),
-                    ),
-                    actions: [
-                      IconButton(
-                        icon: Icon(FluentIcons.cart_16_regular),
-                        onPressed: () {},
+      body: SafeArea(
+        child: Stack(
+          children: [
+            body,
+            Container(
+              margin: const EdgeInsets.all(8),
+              height: 45,
+              child: Hero(
+                tag: "APP_BAR_HERO_TAG",
+                child: ClipRRect(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(14),
+                  ),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                    child: AppBar(
+                      backgroundColor:
+                          Theme.of(context).canvasColor.withOpacity(0.7),
+                      titleSpacing: 0,
+                      leadingWidth: 40,
+                      centerTitle: true,
+                      leading: Builder(builder: (context) {
+                        return Beamer.of(context).canBeamBack
+                            ? IconButton(
+                                icon: Icon(FluentIcons.arrow_left_24_regular),
+                                onPressed: () {
+                                  Beamer.of(context).beamBack();
+                                },
+                              )
+                            : IconButton(
+                                icon: Icon(FluentIcons.list_16_regular),
+                                onPressed: () {
+                                  Scaffold.of(context).openDrawer();
+                                },
+                              );
+                      }),
+                      title: CGradientBox(
+                        child: AppLogo.square(30),
                       ),
-                    ],
+                      actions: [
+                        IconButton(
+                          icon: Icon(FluentIcons.cart_16_regular),
+                          onPressed: () {},
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          )
-        ],
+            )
+          ],
+        ),
       ),
     );
   }

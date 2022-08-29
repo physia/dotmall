@@ -730,7 +730,7 @@ return ${pluralClassName}(this.manager.copyWith(configs:configs));
                         ''';
                     } else if (hasOne.length > 0) {
                       _init += '''
-                             ${pluralize(val!).pascalCase}.modelFromMap(map["${key.snakeCase}"])
+                           map["${key.snakeCase}"] == null? null:  ${pluralize(val!).pascalCase}.modelFromMap(map["${key.snakeCase}"])
                         ''';
                     } else {
                       _init += '''[]''';

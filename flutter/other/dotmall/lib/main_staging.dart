@@ -9,5 +9,5 @@ import 'package:dotmall/app/app.dart';
 import 'package:dotmall/bootstrap.dart';
 
 void main() {
-  bootstrap(() => const App());
+  bootstrap(() =>  App());
 }

@@ -20,35 +20,37 @@ import '../../home/views/store_view.dart';
 import '../../l10n/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:routemaster/routemaster.dart';
-
+import 'package:beamer/beamer.dart';
 import '../../auth/view/auth_view.dart';
 import '../bloc/app_bloc.dart';
 
 class App extends StatelessWidget {
-  const App({super.key});
-  static var _routes = RouteMap(
-    routes: {
-      '/auth': (_) => const MaterialPage(child: AuthView()),
-      '/': (_) => const MaterialPage(child: HomeView()),
-      '/categories/:id': (_) => const MaterialPage(child: CategoryView()),
-      '/stores/:id': (_) => const MaterialPage(child: StoreView()),
-      '/products/:id': (_) => const MaterialPage(child: ProductView()),
-
-      // '/feed': (_) => MaterialPage(child: FeedPage()),
-      // '/settings': (_) => MaterialPage(child: SettingsPage()),
-      // '/feed/profile/:id': (info) => MaterialPage(
-      //   child: ProfilePage(id: info.pathParameters['id'])
-      // ),
-    },
+  App({super.key});
+  final routerDelegate = BeamerDelegate(
+    locationBuilder: RoutesLocationBuilder(
+      routes: {
+        '/': (context, state, data) => HomeView(),
+        '/auth': (context, state, data) => AuthView(),
+        '/categories/:id': (context, state, data) =>
+            CategoryView(categoryId: state.pathParameters['id']!),
+        '/stores/:id': (context, state, data) =>
+            StoreView(storeId: state.pathParameters['id']!),
+        '/products/:id': (context, state, data) =>
+            ProductView(productId: state.pathParameters['id']!),
+      },
+    ),
   );
-  static var router = RoutemasterDelegate(routesBuilder: (context) => _routes);
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
         BlocProvider<AppBloc>(
-          create: (_) => AppBloc(configs: Configs()),
+          create: (_) => AppBloc(
+            configs: Configs(
+              devEndpoint: "http://app.anibalco.com/api/v1",
+              prodEndpoint: "http://app.anibalco.com/api/v1",
+            ),
+          ),
         ),
         BlocProvider<AuthBloc>(
           create: (_) => AuthBloc()..add(AuthLoadingCacheEvent()),
@@ -156,8 +158,8 @@ class App extends StatelessWidget {
           ],
           locale: AppLocalizations.supportedLocales[1],
           supportedLocales: AppLocalizations.supportedLocales,
-          routerDelegate: router,
-          routeInformationParser: RoutemasterParser(),
+          routerDelegate: routerDelegate,
+          routeInformationParser: BeamerParser(),
         ),
       ),
     );

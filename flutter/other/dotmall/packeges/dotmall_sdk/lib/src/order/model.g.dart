@@ -18,8 +18,8 @@ class Orders extends Collection<Order> {
 
   SemanticCardMetaData semanticsOf(Order model) {
     return SemanticCardMetaData<String?, String?, File?>(
-      title: null,
-      subtitle: null,
+      title: model.id,
+      subtitle: model.createdAt.toString(),
       image: null,
     );
   }
@@ -53,11 +53,13 @@ class Orders extends Collection<Order> {
       validatedAt: DateTime.tryParse(map["validated_at"].toString()),
       deletedAt: DateTime.tryParse(map["deleted_at"].toString()),
       closedAt: DateTime.tryParse(map["closed_at"].toString()),
-      orderItems: [
-        for (var item in map["order_items"] ?? []) OrderItems.modelFromMap(item)
-      ],
-      address: Addresses.modelFromMap(map["address"]),
-      customerProfile: CustomerProfiles.modelFromMap(map["customer_profile"]),
+      items: [for (var item in map["items"] ?? []) OrderItem.fromMap(item)],
+      address: map["address"] == null
+          ? null
+          : Addresses.modelFromMap(map["address"]),
+      customerProfile: map["customer_profile"] == null
+          ? null
+          : CustomerProfiles.modelFromMap(map["customer_profile"]),
     );
   }
 
@@ -72,7 +74,7 @@ class Orders extends Collection<Order> {
       "validated_at": order.validatedAt,
       "deleted_at": order.deletedAt,
       "closed_at": order.closedAt,
-      "order_items": [for (var item in order.orderItems ?? []) item?.toMap()],
+      "items": [for (var item in order.items ?? []) item?.toMap()],
       "address": order.address?.toMap(),
       "customer_profile": order.customerProfile?.toMap(),
     };
@@ -277,7 +279,7 @@ class OrderFindOptions extends RequestOptions {
 }
 
 /// OrderRelations
-enum OrderRelations { orderItems, address, customerProfile }
+enum OrderRelations { items, address, customerProfile }
 
 /// OrderFilterables
 enum OrderFilterables {

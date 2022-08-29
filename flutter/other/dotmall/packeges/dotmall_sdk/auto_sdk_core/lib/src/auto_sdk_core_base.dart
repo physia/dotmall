@@ -265,9 +265,9 @@ class Configs {
   final Token? token;
   final AuthCollection Function(Manager)? auth;
   const Configs({
-    this.prodEndpoint = "http://127.0.0.1:3333/api/v1",
-    this.devEndpoint = "http://127.0.0.1:3333/api/v1",
-    this.assetsServer = "http://127.0.0.1:3333",
+    this.prodEndpoint = "http://app.anibalco.com/api/v1",
+    this.devEndpoint = "http://app.anibalco.com/api/v1",
+    this.assetsServer = "http://app.anibalco.com/",
     this.mode = RunMode.development,
     this.language,
     this.auth,

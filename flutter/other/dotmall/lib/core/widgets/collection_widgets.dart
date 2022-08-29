@@ -30,6 +30,18 @@ class CollectionPanelLoadFindEvent extends CollectionPanelEvent {
 }
 
 /// CollectionPanelListEventsq
+class CollectionPanelLoadedFindEvent<T extends Model>
+    extends CollectionPanelEvent {
+  final T model;
+  CollectionPanelLoadedFindEvent(this.model);
+}
+
+class CollectionPanelLoadingFindEvent extends CollectionPanelEvent {
+  final CancelToken cancelToken;
+  CollectionPanelLoadingFindEvent(this.cancelToken);
+}
+
+/// CollectionPanelListEventsq
 class CollectionPanelLoadListEvent extends CollectionPanelEvent {
   final ListRequestOptions? options;
   CollectionPanelLoadListEvent([this.options]);
@@ -44,6 +56,11 @@ class CollectionPanelLoadMoreEvent extends CollectionPanelEvent {
 /// CollectionPanelCancelEvent
 class CollectionPanelCancelEvent extends CollectionPanelEvent {
   CollectionPanelCancelEvent();
+}
+
+class CollectionPanelOnExceptionEvent extends CollectionPanelEvent {
+  final dynamic exception;
+  CollectionPanelOnExceptionEvent(this.exception);
 }
 
 /// [CollectionPanelController] is a controller for [CollectionListPanel] widget.
@@ -63,7 +80,7 @@ class CollectionPanelController extends ValueNotifier<CollectionPanelEvent?> {
 class CollectionListPanel<C extends Collection, M extends Model>
     extends StatefulWidget {
   final C collection;
-  final CollectionEventHandlers handlers;
+  final CollectionEventHandlers? handlers;
   final bool scrollable;
   final Axis scrollDirection;
   final Size? bodySize;
@@ -84,10 +101,12 @@ class CollectionListPanel<C extends Collection, M extends Model>
   final void Function(List<M> selections, M model)? onItemPressed;
   final ScrollController? scrollController;
   final StreamController<CollectionPanelEvent>? controller;
+
+  final Widget? title;
   const CollectionListPanel({
     super.key,
     required this.collection,
-    required this.handlers,
+    this.handlers,
     this.scrollDirection = Axis.vertical,
     this.headBuilder,
     this.bodyBuilder,
@@ -102,6 +121,7 @@ class CollectionListPanel<C extends Collection, M extends Model>
     this.onItemPressed,
     this.scrollController,
     this.controller,
+    this.title,
   });
 
   @override
@@ -121,6 +141,7 @@ class _CollectionListPanelState<C extends Collection, M extends Model>
 
   @override
   void dispose() {
+    controller.add(CollectionPanelCancelEvent());
     controller.close();
     super.dispose();
   }
@@ -146,9 +167,7 @@ class _CollectionListPanelState<C extends Collection, M extends Model>
 
   // _cancel
   void _cancel() {
-    setState(() {
-      cancelToken.cancel();
-    });
+    cancelToken.cancel();
   }
 
   Future<void> _showMessage(String message, {Function? refresh}) async {
@@ -208,34 +227,34 @@ class _CollectionListPanelState<C extends Collection, M extends Model>
       _listError = false;
       _listLoading = true;
     });
-    await Future.delayed(Duration(seconds: 2));
+    //await Future.delayed(Duration(seconds: 2));
     try {
-      widget.handlers.onListLoading(cancelToken);
+      // widget.handlers.onListLoading(cancelToken);
       var response = await widget.collection
           .listR(options: requestOptions.copyWith(cancelToken: cancelToken));
       var parsedRespose =
           widget.collection.paginatedModelFromMap(response.data!);
-      widget.handlers.onListLoaded(parsedRespose);
+      // widget.handlers.onListLoaded(parsedRespose);
       _responses.add(parsedRespose as PaginatedModel<M>);
       setState(() {});
     } on ValidationException catch (e) {
       _listError = true;
-      widget.handlers.onListValidationException(e);
+      // widget.handlers.onListValidationException(e);
       _showMessage("حدثت مشكلة أثناء تحميل البيانات", refresh: _listLoad);
     } on DioError catch (e) {
       _listError = true;
-      widget.handlers.onListDioError(e);
+      // widget.handlers.onListDioError(e);
       var errorMessage = e.error.toString().contains(".message")
           ? e.error.toString().split(".").first
           : e.error.toString();
       _showMessage(errorMessage, refresh: _listLoad);
     } catch (e) {
       _listError = true;
-      widget.handlers.onListError(e);
+      // widget.handlers.onListError(e);
       _showMessage(e.toString(), refresh: _listLoad);
     }
     setState(() {
-      widget.handlers.onListSetState(context);
+      // widget.handlers.onListSetState(context);
       _listLoading = false;
     });
   }
@@ -290,7 +309,7 @@ class _CollectionListPanelState<C extends Collection, M extends Model>
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(widget.collection.table),
+                  widget.title ?? Text(widget.collection.table),
                 ],
               ),
               actions: [
@@ -417,10 +436,9 @@ class _CollectionListPanelState<C extends Collection, M extends Model>
 }
 
 // FIND
-class CollectionFindPanel<C extends Collection, M extends Model>
+class CollectionFindPanel<C extends Collection<M>, M extends Model>
     extends StatefulWidget {
   final C collection;
-  final CollectionEventHandlers handlers;
   final Size? bodySize;
   final String id;
 
@@ -438,7 +456,6 @@ class CollectionFindPanel<C extends Collection, M extends Model>
     super.key,
     required this.id,
     required this.collection,
-    required this.handlers,
     this.headBuilder,
     this.bodyBuilder,
     this.itemBuilder,
@@ -453,7 +470,7 @@ class CollectionFindPanel<C extends Collection, M extends Model>
       _CollectionFindPanelState<C, M>();
 }
 
-class _CollectionFindPanelState<C extends Collection, M extends Model>
+class _CollectionFindPanelState<C extends Collection<M>, M extends Model>
     extends State<CollectionFindPanel<C, M>> {
   late final StreamController<CollectionPanelEvent> controller;
   final CancelToken cancelToken = CancelToken();
@@ -463,6 +480,7 @@ class _CollectionFindPanelState<C extends Collection, M extends Model>
 
   @override
   void dispose() {
+    controller.add(CollectionPanelCancelEvent());
     controller.close();
     super.dispose();
   }
@@ -484,9 +502,7 @@ class _CollectionFindPanelState<C extends Collection, M extends Model>
 
   // _cancel
   void _cancel() {
-    setState(() {
-      cancelToken.cancel();
-    });
+    cancelToken.cancel();
   }
 
   Future<void> _showMessage(String message, {Function? refresh}) async {
@@ -547,33 +563,32 @@ class _CollectionFindPanelState<C extends Collection, M extends Model>
       _findLoading = true;
     });
 
-    await Future.delayed(Duration(seconds: 2));
+    //await Future.delayed(Duration(seconds: 2));
     try {
-      widget.handlers.onListLoading(cancelToken);
+      controller.add(CollectionPanelLoadingFindEvent(cancelToken));
       var response = await widget.collection.findR(widget.id,
           options: requestOptions.copyWith(cancelToken: cancelToken));
       var parsedRespose = widget.collection.singleModelFromMap(response.data!);
-      widget.handlers.onItemLoaded(parsedRespose);
+      controller.add(CollectionPanelLoadedFindEvent<M>(parsedRespose));
       _response = (parsedRespose as M);
       setState(() {});
     } on ValidationException catch (e) {
       _findError = true;
-      widget.handlers.onListValidationException(e);
+      controller.add(CollectionPanelOnExceptionEvent(e));
       _showMessage("حدثت مشكلة أثناء تحميل البيانات", refresh: _findLoad);
     } on DioError catch (e) {
       _findError = true;
-      widget.handlers.onListDioError(e);
+      controller.add(CollectionPanelOnExceptionEvent(e));
       var errorMessage = e.error.toString().contains(".message")
           ? e.error.toString().split(".").first
           : e.error.toString();
       _showMessage(errorMessage, refresh: _findLoad);
     } catch (e) {
       _findError = true;
-      widget.handlers.onListError(e);
+      controller.add(CollectionPanelOnExceptionEvent(e));
       _showMessage(e.toString(), refresh: _findLoad);
     }
     setState(() {
-      widget.handlers.onListSetState(context);
       _findLoading = false;
     });
   }
@@ -968,6 +983,7 @@ class TextPlaceholder extends StatelessWidget {
   final int lines;
   final double height;
   final double width;
+  final Color? color;
 
   const TextPlaceholder({
     super.key,
@@ -976,6 +992,7 @@ class TextPlaceholder extends StatelessWidget {
     this.child,
     this.height = 14,
     this.width = 90,
+    this.color,
   });
 
   @override
@@ -983,14 +1000,19 @@ class TextPlaceholder extends StatelessWidget {
     var random = Random();
     return enabled
         ? Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               for (var i = 0; i < lines; i++)
-                Container(
+                AnimatedContainer(
+                  duration: Duration(milliseconds: 200),
                   height: height,
-                  width: width,
+                  width: width == null
+                      ? width
+                      : ((random.nextDouble() * (width / 2)) + width / 2),
                   margin: const EdgeInsets.symmetric(vertical: 2),
                   decoration: BoxDecoration(
-                    color: Colors.grey.withOpacity(0.2),
+                    color: color ?? Colors.grey.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(8),
                   ),
                 ),

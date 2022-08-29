@@ -1,10 +1,10 @@
 import 'dart:async';
 
+import 'package:beamer/beamer.dart';
 import 'package:dotmall_sdk/dotmall_sdk.dart';
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:routemaster/routemaster.dart';
 
 import '../../app/bloc/app_bloc.dart';
 import '../../app/view/app.dart';
@@ -15,7 +15,8 @@ import '../../l10n/l10n.dart';
 import '../widgets/widgets.dart';
 
 class CategoryView extends StatelessWidget {
-  const CategoryView({Key? key}) : super(key: key);
+  final String categoryId;
+  const CategoryView({Key? key, required this.categoryId}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +29,7 @@ class CategoryView extends StatelessWidget {
             CollectionPanelLoadListEvent(
               ListRequestOptions(
                 where: {
-                  'category_id': RouteData.of(context).pathParameters['id']!,
+                  'category_id': categoryId,
                 },
               ),
             ),
@@ -41,10 +42,9 @@ class CategoryView extends StatelessWidget {
               SizedBox(
                 width: double.infinity,
                 child: CollectionFindPanel<Categories, Category>(
-                  id: RouteData.of(context).pathParameters["id"]!,
+                  id: categoryId,
                   collection:
                       Categories(Manager(context.read<AppBloc>().configs)),
-                  handlers: CollectionEventHandlers(),
                   itemBuilder: (context, panel, model, state) {
                     return SizedBox(
                       child: SemanticCard(
@@ -85,7 +85,7 @@ class CategoryView extends StatelessWidget {
                           ? null
                           : panel.collection.semanticsOf(model),
                       onPressed: () {
-                        App.router.push("/stores/${model!.id}");
+                        context.beamToNamed("/stores/${model!.id}");
                       },
                       style: SemanticCardStyle(
                         direction: Axis.vertical,
